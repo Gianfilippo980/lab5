@@ -57,7 +57,6 @@ class Istogramma:
     
     def Fit1Gauss(self, min, max):
         """Effettua un fit con una gaussiana fra min e max, restituisce la media"""
-        self.AggiornaIsto()
         gauss=ROOT.TF1("Gaussiana", "gaus", min, max)
         self.isto.Fit(gauss, "R+", "")
         parametri=gauss.GetParameters()
@@ -67,7 +66,6 @@ class Istogramma:
     def Fit2Gauss(self, min1, max1, min2, max2):
         """Effettua il fit con 2 gaussiane, resituisce le deu medie"""
         parametri_tot=array( 'd', 6*[0.] )
-        self.AggiornaIsto()
         gauss1=ROOT.TF1("Gaussiana1", "gaus", min1, max1)
         gauss2=ROOT.TF1("Gaussiana2", "gaus", min2, max2)
         somma=ROOT.TF1("Somma", "gaus(0)+gaus(3)", min1, max2)
