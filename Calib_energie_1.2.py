@@ -5,7 +5,8 @@ from array import array
 
 n_chan=8192
 """Numero di bins dell'MCA"""
-
+ROOT.gStyle.SetOptStat(0)
+ROOT.gStyle.SetOptFit(1)
 class Istogramma:
     """Incapsulatore per l'istogramma di Root"""
 
@@ -28,7 +29,7 @@ class Istogramma:
         self.spettro=list(map(int, righe[inizio:fine]))
         if file_fondo:
             self.SottraiFondo(file_fondo)
-        self.AggiornaIsto()
+        self.__AggiornaIsto()
 
     def SottraiFondo(self, file_fondo):
         """Utilizzare questo metodo per effetture la sottrazione fra due spettri
@@ -50,7 +51,7 @@ class Istogramma:
         for i in range(len(fondo)):
             self.spettro[i]-=fondo[i]
         
-    def AggiornaIsto(self):
+    def __AggiornaIsto(self):
         """sposta qualunque cosa sia in spettro nell'istogramma di ROOT"""
         for i in range(len(self.spettro)):
             self.isto.SetBinContent(i+1, self.spettro[i])
@@ -108,14 +109,16 @@ picchi.append(param_cobalto[4])
 cobalto.Disegna(3000, 4500)
 
 cesio=Istogramma('Cesio_800V_240s.mca')
+cesio.SottraiFondo('fondo_800V_240s.mca')
+#cesio.AggiornaIsto()
 param_cesio = cesio.Fit1Gauss(1800, 2050)
 picchi.append(param_cesio[1])
 cesio.Disegna(1600, 2300, 'cesio_800V_240s.pdf')
 
 potassio=Istogramma('Potassio_800V_240s.mca')
-potassio.Fit1Gauss(4000, 5000)
-potassio.Fit1Gauss(50, 1000)
-potassio.Disegna()
+#potassio.Fit1Gauss(4000, 5000)
+#potassio.Fit1Gauss(50, 1000)
+potassio.Disegna(file='salva.pdf')
 
 
 """Alla fine mettiamo la parte ceh fa il grafico cartesiano di picchi ed energie"""
