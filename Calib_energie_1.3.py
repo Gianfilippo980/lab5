@@ -3,8 +3,6 @@ con impostazioni molto diverse fra loro, quindi fatti uno per votlta a mano"""
 import ROOT
 from array import array
 
-n_chan=8192
-"""Numero di bins dell'MCA"""
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetOptFit(1)
 #ROOT.gStyle.SetTitleAlign(4)
@@ -16,12 +14,13 @@ class Istogramma:
         """L'argomento file_fondo è optional, se non specificato, il fondo può essere sottratto con
         una successuva operazione"""
         self.canvas=ROOT.TCanvas()
-        self.isto=ROOT.TH1F(file_dati, file_dati, n_chan, 0, n_chan)
         file=open(file_dati, errors='ignore')
         righe=file.readlines()
         file.close()
         inizio=righe.index("<<DATA>>\n") + 1
         fine=righe.index("<<END>>\n")
+        self.n_chan=fine-inizio
+        self.isto=ROOT.TH1F(file_dati, file_dati, self.n_chan, 0, self.n_chan)
         """questi sono gli indici del primo bin e dell'ultimo"""
         if "GAIA=2;    Analog Gain Index\n" in righe:
             self.scala=10
@@ -69,9 +68,11 @@ class Istogramma:
         errori=somma.GetParErrors()
         return parametri_tot
 
-    def Disegna(self, min=0, max=n_chan, file=False):
+    def Disegna(self, min=0, max=False, file=False):
         """Produce il grafico a video, fra il minimo e il massimo opzionali, se il
         parametro file è un nome di file, la canvas viene salvata."""
+        if max == False:
+            max=self.n_chan
         self.isto.GetXaxis().SetRange(min, max)
         self.isto.GetXaxis().SetTitle('Canale MCA')
         self.isto.GetXaxis().CenterTitle()
@@ -90,6 +91,8 @@ class Istogramma:
         inizio=righe.index("<<DATA>>\n") + 1
         fine=righe.index("<<END>>\n")
         """questi sono gli indici del primo bin e dell'ultimo"""
+        if fine-inizio !=self.n_chan:
+            print("Attenzione! Fondo e spettro hanno un diverso numero di canali!")
         if "GAIA=2;    Analog Gain Index\n" in righe:
             scala_fondo=10
             """Questo è il fondoscala in V dello spettro"""
